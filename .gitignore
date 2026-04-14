@@ -1,0 +1,6 @@
+node_modules/
+.claude/
+Downloads/
+temp_downloads/
+logs/
+profiles/

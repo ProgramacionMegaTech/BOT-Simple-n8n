@@ -1,0 +1,68 @@
+services:
+  # Servidor Node.js con Selenium
+  selenium-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: selenium-bot
+    ports:
+      - "5858:5858"
+      - "5900:5900"  # Puerto VNC para ver la interfaz gráfica
+    volumes:
+      # Volumen para acceder a las descargas desde el host
+      - ./Downloads:/app/Downloads
+      # Volumen compartido para temp_downloads (accesible desde n8n)
+      - shared-downloads:/app/temp_downloads
+      # Volumen para logs (opcional)
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
+      - PORT=5858
+      - DISPLAY=:99
+    networks:
+      - automation-network
+    restart: unless-stopped
+    # Memoria compartida para Chrome (necesario para GPU)
+    shm_size: 2gb
+    # Configuración de recursos (opcional, ajustar según necesidad)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 2G
+
+  # N8N para automatización
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      # Persistir workflows y datos de n8n
+      - n8n-data:/home/node/.n8n
+      # Acceso COMPLETO (lectura/escritura) a temp_downloads y Downloads
+      - shared-downloads:/app/temp_downloads
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      # URL del bot para que n8n pueda comunicarse
+      - BOT_URL=http://selenium-bot:5858
+    networks:
+      - automation-network
+    restart: unless-stopped
+    depends_on:
+      - selenium-bot
+
+networks:
+  automation-network:
+    driver: bridge
+
+volumes:
+  n8n-data:
+    driver: local
+  shared-downloads:
+    driver: local
