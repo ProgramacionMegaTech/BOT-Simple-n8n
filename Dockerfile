@@ -46,10 +46,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependencias de Node.js
-RUN npm install --production
+RUN npm install --omit=dev
 
 # Copiar el resto del código
 COPY . .
+
+# Pre-descargar ChromeDriver usando selenium-manager (evita descarga en tiempo de ejecución)
+RUN node_modules/selenium-webdriver/bin/linux/selenium-manager --browser chrome --output json
 
 # Crear directorio de descargas con permisos amplios
 RUN mkdir -p /app/Downloads /app/temp_downloads && \
