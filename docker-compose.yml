@@ -12,7 +12,7 @@ services:
       # Volumen para acceder a las descargas desde el host
       - ./Downloads:/app/Downloads
       # Volumen compartido para temp_downloads (accesible desde n8n)
-      - shared-downloads:/app/temp_downloads
+      - ./shared-downloads:/app/temp_downloads
       # Volumen para logs (opcional)
       - ./logs:/app/logs
     environment:
@@ -40,9 +40,9 @@ services:
       - "5678:5678"
     volumes:
       # Persistir workflows y datos de n8n
-      - n8n-data:/home/node/.n8n
+      - ./n8n-data:/home/node/.n8n
       # Acceso COMPLETO (lectura/escritura) a temp_downloads y Downloads
-      - shared-downloads:/app/temp_downloads
+      - ./shared-downloads:/app/temp_downloads
     environment:
       - N8N_HOST=localhost
       - N8N_PORT=5678
@@ -61,8 +61,3 @@ networks:
   automation-network:
     driver: bridge
 
-volumes:
-  n8n-data:
-    driver: local
-  shared-downloads:
-    driver: local
