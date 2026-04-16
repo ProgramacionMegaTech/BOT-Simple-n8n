@@ -1,8 +1,8 @@
-# Usar imagen base de Node.js 24.8.0 con Debian
-FROM node:24.8.0-bookworm
+# Usar imagen base de Node.js 24 LTS con Debian (última versión con parches de seguridad)
+FROM node:24-bookworm
 
 # Instalar dependencias del sistema necesarias para Chrome, Selenium, X11 y pdftk
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     wget \
     gnupg \
     ca-certificates \
