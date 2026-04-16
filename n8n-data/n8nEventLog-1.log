@@ -1,0 +1,2 @@
+{"__type":"$$EventMessageAudit","id":"2ef748f7-6a47-4f80-9c9b-75599b225470","ts":"2026-04-16T14:19:13.106-05:00","eventName":"n8n.audit.user.login.success","message":"n8n.audit.user.login.success","payload":{"userId":"9da8da33-6aad-4ef3-9d60-61ace0004709","_email":"desarrollomegatech@gmail.com","_firstName":"MegaTech","_lastName":"Software","globalRole":"global:owner","authenticationMethod":"email"}}
+{"__type":"$$EventMessageConfirm","confirm":"2ef748f7-6a47-4f80-9c9b-75599b225470","ts":"2026-04-16T14:19:13.106-05:00","source":{"id":"0","name":"eventBus"}}
