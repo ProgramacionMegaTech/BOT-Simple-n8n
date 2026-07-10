@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 
 const certificadoIndividualSimple = require('./simple')
+const planillasRetiroSimple = require('./retiros')
 const mergePDFsByAdministradora = require('./shared/merge_pdf')
+const { mergePDFs } = require('./shared/merge_pdf')
 
 const app = express();
 const PORT = process.env.PORT || 5858;
@@ -43,7 +45,6 @@ async function descargarConReintento(data, codigoEPS) {
 
     return response;
 }
-
 
 //#region END POINTS
 app.post('/bot/n8n', async (req, res) => {
@@ -115,6 +116,47 @@ app.post('/bot/n8n/mergePdf', async (req, res) => {
                 console.error('\n✗ Error fatal:', error.message);
                 process.exit(1);
             });
+
+    } catch (error) {
+        console.error('Error ejecutando el bot:', error);
+    }
+
+});
+
+
+app.post('/bot/n8n/mergePdfArray', async (req, res) => {
+    const data = req.body;
+
+    try {
+        const response = await mergePDFs(data);
+        res.json(response);
+
+    } catch (error) {
+        console.error('Error ejecutando el bot:', error);
+        res.status(500).json({
+            result: false,
+            error: error.message
+        });
+    }
+
+});
+
+
+app.post('/bot/n8n/planillasRetiro', async (req, res) => {
+    const data = req.body;
+    console.log(data);
+
+    try {
+
+        let response = await planillasRetiroSimple(data);
+
+        // Si falló (result es false), lo intentamos una vez más
+        if (response && response.result === false) {
+            console.log(`⚠️ Falló el primer intento. Reintentando...`);
+            response = await planillasRetiroSimple(data);
+        }
+
+        res.json(response);
 
     } catch (error) {
         console.error('Error ejecutando el bot:', error);

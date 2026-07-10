@@ -118,4 +118,91 @@ async function mergePDFsByAdministradora(data) {
 }
 
 
+/**
+ * Combina todos los PDFs de un arreglo en un único archivo usando pdftk
+ * @param {Object} data - Estructura: { path: string, data: string[] }
+ *   - data.path: subcarpeta dentro de temp_downloads/chrome-simple-session y de Downloads
+ *   - data.data: arreglo de nombres de archivos PDF a combinar
+ */
+async function mergePDFs(data) {
+    try {
+        // Verificar si pdftk está instalado
+        if (!checkPdftkInstalled()) {
+            console.error('❌ ERROR: pdftk no está instalado en el sistema');
+            console.log('\n📦 Para instalar pdftk:');
+            console.log('   Ubuntu/Debian: sudo apt-get install pdftk');
+            console.log('   Fedora/RHEL:   sudo dnf install pdftk');
+            console.log('   Arch Linux:    sudo pacman -S pdftk');
+            console.log('   macOS:         brew install pdftk-java\n');
+            throw new Error('pdftk no está instalado');
+        }
+
+        // Configuración de rutas
+        const filesFromPath = path.resolve(__dirname, '..', 'temp_downloads', 'chrome-simple-session', data.path);
+        const outputPath = path.resolve(__dirname, '..', 'Downloads', data.path);
+
+        // Crear carpeta de salida si no existe
+        if (!fs.existsSync(outputPath)) {
+            fs.mkdirSync(outputPath, { recursive: true });
+            console.log(`✓ Carpeta creada: ${outputPath}`);
+        }
+
+        const archivos = data.data;
+
+        // Validar que hay archivos para combinar
+        if (!archivos || archivos.length === 0) {
+            console.log('⚠️  No hay archivos para combinar');
+            return { result: false, error: 'No hay archivos para combinar' };
+        }
+
+        // Verificar que todos los archivos existen
+        const validFiles = [];
+        for (const archivo of archivos) {
+            const filePath = path.join(filesFromPath, archivo);
+            if (fs.existsSync(filePath)) {
+                validFiles.push(filePath);
+                console.log(`  ✓ Encontrado: ${archivo}`);
+            } else {
+                console.warn(`  ⚠️  Archivo no encontrado: ${archivo}`);
+            }
+        }
+
+        // Si no hay archivos válidos, no continuar
+        if (validFiles.length === 0) {
+            console.log('⚠️  No se pudo crear el PDF (ningún archivo válido)');
+            return { result: false, error: 'Ningún archivo válido' };
+        }
+
+        // Generar nombre del archivo de salida a partir de data.path
+        const outputFileName = `${data.path}.pdf`
+            .replace(/\s+/g, '_')             // Reemplazar espacios por guiones bajos
+            .replace(/[^a-zA-Z0-9_.-]/g, ''); // Eliminar caracteres especiales
+
+        const outputFilePath = path.join(outputPath, outputFileName);
+
+        // Construir y ejecutar comando pdftk (comillas para manejar espacios)
+        const inputFiles = validFiles.map(f => `"${f}"`).join(' ');
+        const command = `pdftk ${inputFiles} cat output "${outputFilePath}"`;
+
+        console.log('🔧 Ejecutando pdftk...');
+        execSync(command, { stdio: 'pipe' });
+
+        // Verificar que el archivo se creó correctamente
+        if (fs.existsSync(outputFilePath)) {
+            const stats = fs.statSync(outputFilePath);
+            console.log(`✅ PDF creado: ${outputFileName} (${validFiles.length} archivos, ${(stats.size / 1024).toFixed(2)} KB)`);
+            return { result: true, path: outputFilePath };
+        }
+
+        console.error('❌ Error: El archivo no se creó correctamente');
+        return { result: false, error: 'El archivo no se creó correctamente' };
+
+    } catch (error) {
+        console.error('\n❌ Error en el proceso:', error.message);
+        throw error;
+    }
+}
+
+
 module.exports = mergePDFsByAdministradora;
+module.exports.mergePDFs = mergePDFs;
