@@ -24,7 +24,7 @@ async function hacerClick(driver, locator, descripcion, timeout = 5000) {
         return elemento;
     } catch (error) {
         logger.error(`Error al hacer click en ${descripcion}: ${error.message}`);
-        throw "Error en el portal de la Equidad";
+        throw "Error en el portal";
     }
 }
 
@@ -64,7 +64,7 @@ async function navegarA(driver, url, descripcion) {
         await driver.get(url);
     } catch (error) {
         logger.error(`Error al navegar a ${descripcion}: ${error.message}`);
-        throw "Error en el portal de la Equidad";
+        throw "Error en el portal";
     }
 
     console.log(`✅ Navegación a ${descripcion} completada`);

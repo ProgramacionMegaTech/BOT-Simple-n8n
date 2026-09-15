@@ -50,10 +50,14 @@ async function descargarConReintento(data, codigoEPS) {
 app.post('/bot/n8n', async (req, res) => {
     const data = req.body;
 
-    let rest_nuevaEPS = {};
-    let rest_SOS = {};
-    let rest_nuevaEPSMovilidad = {};
     let rest_compensar = {};
+    let rest_famisanar = {};
+    let rest_sura = {};
+
+    // EPS DESHABILITADAS TEMPORALMENTE
+    // let rest_nuevaEPS = {};
+    // let rest_nuevaEPSMovilidad = {};
+    // let rest_SOS = {};
 
     console.log(data);
 
@@ -64,33 +68,48 @@ app.post('/bot/n8n', async (req, res) => {
             rest_compensar = await descargarConReintento(data, "EPS008");
         }
 
-        if (data.NUEVA_EPS > 0) {
-            console.log('🔄 Descargando Certificados de Nueva EPS...');
-            rest_nuevaEPS = await descargarConReintento(data, "EPS037");
-        }
-
-        if (data.SOS > 0) {
-            console.log('🔄 Descargando Certificados de SOS...');
-            rest_SOS = await descargarConReintento(data, "EPS018");
-        }
-
-        if (data.NUEVA_EPS_M > 0) {
-            console.log('🔄 Descargando Certificados de Nueva EPS Movilidad...');
-            rest_nuevaEPSMovilidad = await descargarConReintento(data, "EPS041");
-        }
 
         if (data.FAMISANAR > 0) {
-            console.log('🔄 Descargando Certificados de Famisanar...');
+            console.log('🔄 Descargando Certificados de Sanitas...');
             // Corregido: asignación a rest_famisanar
             rest_famisanar = await descargarConReintento(data, "EPS017");
         }
 
+        if (data.EPS_SURA > 0) {
+            console.log('🔄 Descargando Certificados de Famisanar...');
+            // Corregido: asignación a rest_famisanar
+            rest_sura = await descargarConReintento(data, "EPS010");
+        }
+
+        // if (data.NUEVA_EPS > 0) {
+        //     console.log('🔄 Descargando Certificados de Nueva EPS...');
+        //     rest_nuevaEPS = await descargarConReintento(data, "EPS037");
+        // }
+
+        // if (data.SOS > 0) {
+        //     console.log('🔄 Descargando Certificados de SOS...');
+        //     rest_SOS = await descargarConReintento(data, "EPS018");
+        // }
+
+        // if (data.NUEVA_EPS_M > 0) {
+        //     console.log('🔄 Descargando Certificados de Nueva EPS Movilidad...');
+        //     rest_nuevaEPSMovilidad = await descargarConReintento(data, "EPS041");
+        // }
+
+        // if (data.SANITAS > 0) {
+        //     console.log('🔄 Descargando Certificados de Sanitas...');
+        //     // Corregido: asignación a rest_famisanar
+        //     rest_sanitas = await descargarConReintento(data, "EPS005");
+        // }
+
+
         const response = {
             COMPENSAR: (typeof rest_compensar !== 'undefined') ? rest_compensar.result : null,
-            NUEVA_EPS: (typeof rest_nuevaEPS !== 'undefined') ? rest_nuevaEPS.result : null,
-            SOS: (typeof rest_SOS !== 'undefined') ? rest_SOS.result : null,
-            NUEVA_EPS_M: (typeof rest_nuevaEPSMovilidad !== 'undefined') ? rest_nuevaEPSMovilidad.result : null,
-            FAMISANAR: (typeof rest_famisanar !== 'undefined') ? rest_famisanar.result : null
+            FAMISANAR: (typeof rest_famisanar !== 'undefined') ? rest_famisanar.result : null,
+            SURA: (typeof rest_sura !== 'undefined') ? rest_sura.result : null
+            // NUEVA_EPS: (typeof rest_nuevaEPS !== 'undefined') ? rest_nuevaEPS.result : null,
+            // SOS: (typeof rest_SOS !== 'undefined') ? rest_SOS.result : null,
+            // NUEVA_EPS_M: (typeof rest_nuevaEPSMovilidad !== 'undefined') ? rest_nuevaEPSMovilidad.result : null,
         };
 
         res.json(response);

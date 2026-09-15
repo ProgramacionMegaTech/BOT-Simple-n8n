@@ -52,7 +52,7 @@ async function hacerLogin(driver) {
 async function buscarPlanillaRetiro(driver, data) {
 
     // Busqueda del Aportate
-    await seleccionarOpcion(driver, By.id('doc-types'), "NI", 'Tipo de documento de identificación');
+    await seleccionarOpcion(driver, By.id('doc-types'), "NI", 'Tipo de documento de identificación Empersa');
     await llenarCampo(driver, By.id('numeroIdentificacion'), data.NIT_EMPRESA, 'Número de identificación');
     await hacerClick(driver, By.className('btn btn-tertiary'), 'Boton Buscar Aportante');
     await driver.sleep(2000);
@@ -61,14 +61,16 @@ async function buscarPlanillaRetiro(driver, data) {
     await driver.sleep(3000);
 
     await navegarA(driver, 'https://www.simple.co/gestion/#/content-other-app/337?url=%2FWeb%2Ffaces%2Fpages%2Fcomprobantes%2Findividuales%2Findividuales.xhtml', 'Página de Informe individual');
-    await driver.sleep(3000);
+    await driver.sleep(5000);
 
     // Llenar campos dentro del iframe
     const iframe = await driver.findElement(By.id('iframeApp'));
     await driver.switchTo().frame(iframe);
 
     await llenarCampo(driver, By.xpath('//*[@id="tx_ntu:numeroPlanilla"]'), data.NUMERO_PLANILLA, 'Input Número de planilla');
-    await driver.sleep(1000);
+    await driver.sleep(500);
+    await seleccionarOpcion(driver, By.xpath('//*[@id="tipoDocumentoCotizante"]'), data.TIPO_DOCUMENTO, 'Tipo de documento de identificación Cliente');
+    await driver.sleep(500);
     await llenarCampo(driver, By.xpath('//*[@id="inputNroDocCotizante"]'), data.DOCUMENTO_CLIENTE, 'Input Número de documento');
 
 
@@ -83,11 +85,12 @@ async function buscarPlanillaRetiro(driver, data) {
     const currentDate = data.FECHA_OPERACION;
     const company = data.NOMBRE_EMPRESA;
     const numeroPlanilla = data.NUMERO_PLANILLA
+    const documentoCliente = data.DOCUMENTO_CLIENTE
 
     const finalDir = path.join(path.dirname(pdfPath), `${company}_${currentDate}`);
     fs.mkdirSync(finalDir, { recursive: true });
 
-    const fileName = `${company}_${numeroPlanilla}.pdf`;
+    const fileName = `${company}_${numeroPlanilla}_${documentoCliente}.pdf`;
     const finalPath = path.join(finalDir, fileName);
 
     fs.renameSync(pdfPath, finalPath);

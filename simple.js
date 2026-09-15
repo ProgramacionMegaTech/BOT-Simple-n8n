@@ -21,7 +21,9 @@ const epsCodes = {
     EPS018: "SOS",
     EPS041: "NUEVA EPS MOVILIDAD",
     EPS008: "COMPENSAR",
-    EPS017: "FAMISANAR"
+    EPS017: "FAMISANAR",
+    EPS005: "SANITAS",
+    EPS010: "SURA"
 }
 
 
@@ -35,15 +37,19 @@ async function hacerLogin(driver) {
     await seleccionarOpcion(driver, By.id('doc-types'), "CC", 'Tipo de documento de identificación');
     await llenarCampo(driver, By.id('nro-doc-login'), "14467044", 'Número de identificación');
     console.log('⏳ reCaptcha...');
-    await driver.sleep(60000);
+    await driver.sleep(7000);
 
     console.log('⏳ Ingresando Password...');
-    await hacerClick(driver, By.id('0'), 'Input password');
-    await hacerClick(driver, By.id('9'), 'Input password');
     await hacerClick(driver, By.id('1'), 'Input password');
+    await driver.sleep(300);
+    await hacerClick(driver, By.id('4'), 'Input password');
+    await driver.sleep(150);
     await hacerClick(driver, By.id('1'), 'Input password');
+    await driver.sleep(120);
+    await hacerClick(driver, By.id('1'), 'Input password');
+    await driver.sleep(160);
     await hacerClick(driver, By.id('login'), 'Boton login');
-    await driver.sleep(3000);
+    await driver.sleep(7000);
 }
 
 
